@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rank de Qualidade — B3</title>
 <meta name="description" content="Ranking multifator de ações da B3 a partir de dados do Fundamentus, com explicação de cada indicador. Ferramenta de estudo, não é recomendação de investimento.">
-<meta name="theme-color" content="#0f172a">
+
+<!-- Cor da barra do navegador. O app.js reescreve isso quando o botao de
+     tema e usado, para a barra nao destoar do resto da tela. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icones/icone-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icones/icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rank B3">
 
 <script>
   /* Aplica o tema antes da primeira pintura. Se isso rodasse junto com o app.js
@@ -21,6 +31,10 @@
 <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
+
+<p class="offline oculto" id="barraOffline" role="status">
+  Sem conexão — mostrando o último retrato baixado. Confira a data da coleta.
+</p>
 
 <header class="topo">
   <div class="faixa">

@@ -95,6 +95,18 @@ body {
 
 a { color: var(--acento); }
 
+/* --------------------------- offline --------------------------- */
+
+.offline {
+  margin: 0;
+  padding: 9px 20px;
+  background: var(--alerta-bg);
+  color: var(--texto);
+  border-bottom: 1px solid var(--alerta);
+  font-size: .85rem;
+  text-align: center;
+}
+
 /* ---------------------------- topo ---------------------------- */
 
 .topo {

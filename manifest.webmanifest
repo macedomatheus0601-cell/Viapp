@@ -1,0 +1,49 @@
+{
+  "name": "Rank de Qualidade — B3",
+  "short_name": "Rank B3",
+  "description": "Ranking multifator de ações da B3 a partir do Fundamentus, com explicação de cada indicador. Ferramenta de estudo, não é recomendação de investimento.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "icones/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icones/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icones/icone-512-mascara.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Consenso 3/3",
+      "short_name": "Consenso",
+      "description": "Papéis no decil superior dos três esquemas",
+      "url": "./#levantamentos"
+    },
+    {
+      "name": "Método",
+      "short_name": "Método",
+      "description": "Como o score é montado e onde ele engana",
+      "url": "./#metodo"
+    }
+  ]
+}

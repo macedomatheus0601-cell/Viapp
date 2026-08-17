@@ -37,6 +37,22 @@ function pintarBotao() {
   $("#btnTema").setAttribute("aria-label", `Tema ${rotulo}. Clique para alternar.`);
 }
 
+/* A barra do navegador (e a do app instalado) e pintada pela meta theme-color.
+   As duas do HTML respondem so ao sistema, entao a escolha manual precisa
+   escrever uma terceira, sem media, que vence as outras. */
+function pintarBarraNavegador() {
+  const escuro = document.documentElement.dataset.tema === "escuro"
+    || (!document.documentElement.dataset.tema && sistemaEscuro());
+
+  let meta = document.querySelector('meta[name="theme-color"]:not([media])');
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = "theme-color";
+    document.head.appendChild(meta);
+  }
+  meta.content = escuro ? "#0f172a" : "#ffffff";
+}
+
 function aplicarTema(t) {
   if (t === "sistema") delete document.documentElement.dataset.tema;
   else document.documentElement.dataset.tema = t;
@@ -47,6 +63,7 @@ function aplicarTema(t) {
   } catch (e) { /* navegacao anonima pode bloquear */ }
 
   pintarBotao();
+  pintarBarraNavegador();
 }
 
 $("#btnTema").addEventListener("click", () => {
@@ -55,10 +72,12 @@ $("#btnTema").addEventListener("click", () => {
 });
 
 // Se estiver em "sistema" e o SO trocar de tema, o rotulo do botao acompanha.
-window.matchMedia("(prefers-color-scheme: dark)")
-  .addEventListener("change", () => { if (temaAtual() === "sistema") pintarBotao(); });
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  if (temaAtual() === "sistema") { pintarBotao(); pintarBarraNavegador(); }
+});
 
 pintarBotao();
+pintarBarraNavegador();
 
 // ============================================================= formato
 
@@ -810,5 +829,24 @@ $$(".aba").forEach((b) =>
   b.addEventListener("click", () => trocarAba(b.dataset.aba)));
 
 if (ABAS.includes(location.hash.slice(1))) trocarAba(location.hash.slice(1));
+
+// ================================================================= pwa
+
+/* O service worker guarda a casca do site para abrir sem internet.
+   Só funciona em HTTPS ou em localhost — file:// nao registra. */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch((e) =>
+      console.warn("Service worker nao registrado:", e.message));
+  });
+}
+
+function marcarConexao() {
+  $("#barraOffline").classList.toggle("oculto", navigator.onLine);
+}
+
+window.addEventListener("online", marcarConexao);
+window.addEventListener("offline", marcarConexao);
+marcarConexao();
 
 carregar();
