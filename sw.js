@@ -14,7 +14,7 @@
        na tela denuncia a idade dele.
    ------------------------------------------------------------------ */
 
-const VERSAO = "v1";
+const VERSAO = "v2";
 const CACHE_CASCA = `casca-${VERSAO}`;
 const CACHE_DADOS = `dados-${VERSAO}`;
 
@@ -62,7 +62,9 @@ self.addEventListener("fetch", (ev) => {
 
   if (req.url.includes("/dados/")) {
     ev.respondWith(redePrimeiro(req));
-  } else if (req.mode === "navigate") {
+  } else if (req.mode === "navigate" && !req.url.endsWith(".pdf")) {
+    // Abrir um PDF tambem conta como navegacao. Sem a excecao, offline ele
+    // receberia o index.html no lugar do arquivo — pior que um erro honesto.
     ev.respondWith(navegacao(req));
   } else {
     ev.respondWith(cachePrimeiro(req));

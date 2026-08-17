@@ -636,6 +636,56 @@ tr.consenso-3 td:first-child { box-shadow: inset 3px 0 0 var(--destaque); }
 .mini-setor { color: var(--texto-fraco); font-size: .78rem; }
 .mini-valor { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 650; }
 
+/* ------------------------- link do manual ------------------------- */
+
+.manual {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  margin-bottom: 6px;
+  background: var(--papel);
+  border: 1px solid var(--borda);
+  border-left: 4px solid var(--acento);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  text-decoration: none;
+  color: var(--texto);
+}
+
+.manual:hover { border-color: var(--acento); }
+.manual:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+.manual-icone {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--acento);
+  color: var(--fundo);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.manual-txt { display: flex; flex-direction: column; gap: 3px; }
+.manual-txt strong { font-size: .97rem; color: var(--acento); }
+
+.manual-sub {
+  font-size: .84rem;
+  color: var(--texto-fraco);
+  line-height: 1.4;
+}
+
+.manual-seta {
+  flex: none;
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: var(--acento);
+}
+
 /* ---------------------------- texto ---------------------------- */
 
 .painel h2 { font-size: 1.2rem; margin: 28px 0 10px; letter-spacing: -.01em; }
