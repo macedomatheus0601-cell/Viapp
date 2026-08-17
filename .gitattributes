@@ -6,3 +6,16 @@
 *.yaml text eol=lf
 *.py text eol=lf
 *.json text eol=lf
+
+# Binarios: nunca converter quebra de linha, sob pena de corromper o arquivo.
+# O 'text=auto' acima adivinha pela presenca de byte nulo, e o PDF gerado pelo
+# reportlab nao tem nenhum — foi classificado como texto. Aqui nao se adivinha.
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.woff binary
+*.woff2 binary
