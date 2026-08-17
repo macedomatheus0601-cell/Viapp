@@ -34,5 +34,8 @@ jobs:
             echo "Nada mudou."
           else
             git commit -m "dados: coleta de $(date -u +%Y-%m-%d)"
-            git push
+            # O main pode ter andado enquanto o scraper rodava (ou este job pode ser
+            # a repeticao de uma execucao antiga). Sem isso, o push e recusado.
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
