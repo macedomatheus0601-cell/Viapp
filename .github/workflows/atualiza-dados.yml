@@ -33,7 +33,9 @@ jobs:
           if git diff --staged --quiet; then
             echo "Nada mudou."
           else
-            git commit -m "dados: coleta de $(date -u +%Y-%m-%d)"
+            # Data de Brasilia, nao UTC: o job roda 22h BRT, quando o UTC ja virou
+            # o dia seguinte — a mensagem ficaria um dia a frente do arquivo gravado.
+            git commit -m "dados: coleta de $(TZ=America/Sao_Paulo date +%Y-%m-%d)"
             # O main pode ter andado enquanto o scraper rodava (ou este job pode ser
             # a repeticao de uma execucao antiga). Sem isso, o push e recusado.
             git pull --rebase origin main

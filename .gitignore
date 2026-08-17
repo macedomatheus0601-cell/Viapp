@@ -219,3 +219,6 @@ __marimo__/
 
 # Extras do projeto
 .DS_Store
+
+# Configuracao local do servidor de desenvolvimento
+.claude/

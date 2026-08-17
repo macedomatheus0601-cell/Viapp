@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rank de Qualidade — B3</title>
+<meta name="description" content="Ranking multifator de ações da B3 a partir de dados do Fundamentus, com explicação de cada indicador. Ferramenta de estudo, não é recomendação de investimento.">
+<meta name="theme-color" content="#0f172a">
+
+<script>
+  /* Aplica o tema antes da primeira pintura. Se isso rodasse junto com o app.js
+     (no fim do body), a pagina piscaria em claro antes de virar escura. */
+  (function () {
+    try {
+      var t = localStorage.getItem("tema");
+      if (t === "claro" || t === "escuro") document.documentElement.dataset.tema = t;
+    } catch (e) { /* navegacao anonima pode bloquear o localStorage */ }
+  })();
+</script>
+
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="faixa">
+    <div class="marca">
+      <h1>Rank de Qualidade — B3</h1>
+      <p class="sub">Ranking multifator a partir do Fundamentus</p>
+    </div>
+
+    <div class="topo-dir">
+      <button id="btnTema" class="btn-tema" type="button" aria-live="polite">
+        <span class="tema-icone" aria-hidden="true"></span>
+        <span class="tema-texto"></span>
+      </button>
+
+      <div class="coleta" id="coleta">
+        <span class="coleta-rot">Última coleta</span>
+        <strong class="coleta-data" id="coletaData">carregando…</strong>
+        <span class="coleta-hora" id="coletaHora"></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="aviso" role="note">
+    <strong>Não é recomendação de investimento.</strong>
+    É uma ferramenta de triagem quantitativa feita para estudo. Os pesos são plausíveis,
+    mas não foram testados historicamente. Nada aqui considera seus objetivos ou sua
+    situação financeira. Decida por conta própria e sob sua responsabilidade.
+  </p>
+
+  <nav class="abas" role="tablist" aria-label="Seções">
+    <button class="aba ativa" role="tab" data-aba="rank"          aria-selected="true">Rank</button>
+    <button class="aba"       role="tab" data-aba="ficha"         aria-selected="false">Ficha da ação</button>
+    <button class="aba"       role="tab" data-aba="levantamentos" aria-selected="false">Levantamentos</button>
+    <button class="aba"       role="tab" data-aba="setores"       aria-selected="false">Setores</button>
+    <button class="aba"       role="tab" data-aba="metodo"        aria-selected="false">Método</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ================= RANK ================= -->
+  <section id="painel-rank" class="painel ativa" role="tabpanel">
+
+    <div class="resumo" id="resumo"></div>
+
+    <div class="controles">
+      <label class="campo campo-busca">
+        <span class="rot">Buscar papel</span>
+        <input type="search" id="busca" placeholder="ex.: PLPL3" autocomplete="off">
+      </label>
+
+      <label class="campo">
+        <span class="rot">Setor</span>
+        <select id="filtroSetor"><option value="">Todos</option></select>
+      </label>
+
+      <label class="campo">
+        <span class="rot">Ordenar por</span>
+        <select id="ordem">
+          <option value="score">A · Pesos definidos</option>
+          <option value="scoreSet">B · Setorial</option>
+          <option value="scoreIg">C · Pesos iguais</option>
+        </select>
+      </label>
+
+      <label class="alternador">
+        <input type="checkbox" id="soConsenso">
+        <span>Só consenso 3/3</span>
+      </label>
+    </div>
+
+    <p class="contagem" id="contagem"></p>
+
+    <div class="rolagem">
+      <table class="tabela" id="tabela">
+        <thead>
+          <tr>
+            <th class="col-pos">#</th>
+            <th class="col-papel">Papel</th>
+            <th class="col-setor">Setor</th>
+            <th class="num">Score</th>
+            <th class="col-cons">Consenso</th>
+            <th class="num">ROIC</th>
+            <th class="num">Cresc. 5a</th>
+            <th class="num">EV/EBITDA</th>
+            <th class="num">Mrg. EBIT</th>
+            <th class="num">Dív.Líq./Patr.</th>
+          </tr>
+        </thead>
+        <tbody id="corpo"></tbody>
+      </table>
+    </div>
+
+    <p class="vazio oculto" id="vazio">Nenhum papel corresponde aos filtros.</p>
+  </section>
+
+  <!-- ================= FICHA ================= -->
+  <section id="painel-ficha" class="painel" role="tabpanel">
+    <label class="campo campo-largo">
+      <span class="rot">Escolha o papel</span>
+      <select id="seletorFicha"></select>
+    </label>
+    <div id="ficha"></div>
+  </section>
+
+  <!-- ============= LEVANTAMENTOS ============= -->
+  <section id="painel-levantamentos" class="painel" role="tabpanel">
+
+    <h2>Consenso 3/3</h2>
+    <p class="intro">
+      Papéis no decil superior dos três esquemas ao mesmo tempo. A posição deles não
+      depende da escolha de pesos nem do universo de comparação.
+    </p>
+    <div id="listaConsenso" class="grade-papeis"></div>
+
+    <h2>Explorar um indicador</h2>
+    <p class="intro">
+      Escolha um indicador para ver o que ele significa, como o universo elegível se
+      distribui nele, e quem está nos extremos.
+    </p>
+
+    <label class="campo campo-largo">
+      <span class="rot">Indicador</span>
+      <select id="seletorIndicador"></select>
+    </label>
+
+    <div id="exploracao"></div>
+  </section>
+
+  <!-- ================= SETORES ================= -->
+  <section id="painel-setores" class="painel" role="tabpanel">
+    <p class="intro">
+      Agregado dos papéis elegíveis por setor. A mediana resiste melhor a um papel
+      extremo do que a média — num setor de 6 empresas, uma sozinha distorceria a média.
+    </p>
+    <div class="rolagem">
+      <table class="tabela" id="tabelaSetores">
+        <thead>
+          <tr>
+            <th>Setor</th>
+            <th class="num">Papéis</th>
+            <th class="num">Score mediano</th>
+            <th class="num">3/3</th>
+            <th>Melhor colocado</th>
+            <th>Percentil próprio</th>
+          </tr>
+        </thead>
+        <tbody id="corpoSetores"></tbody>
+      </table>
+    </div>
+    <p class="nota nota-solta">
+      "Percentil próprio" indica se o setor tem pelo menos 5 papéis elegíveis. Abaixo
+      disso, o esquema B não consegue comparar a empresa com pares e ela herda as notas
+      do universo inteiro — o consenso desses papéis é mais fraco do que parece.
+    </p>
+  </section>
+
+  <!-- ================= MÉTODO ================= -->
+  <section id="painel-metodo" class="painel" role="tabpanel">
+
+    <h2>Como o score é montado</h2>
+    <p>
+      Cada indicador vira uma nota de 0 a 100 conforme a <strong>posição percentil</strong>
+      da empresa no universo elegível, e não pelo valor bruto. Isso torna os pesos
+      comparáveis entre si: sem essa conversão, um indicador que varia de 0 a 300
+      dominaria outro que varia de 0 a 1, independentemente do peso escolhido.
+    </p>
+
+    <div class="rolagem">
+      <table class="tabela tabela-metodo">
+        <thead>
+          <tr><th>Fator</th><th class="num">Peso</th><th>Direção</th><th>Por quê</th></tr>
+        </thead>
+        <tbody id="corpoFatores"></tbody>
+      </table>
+    </div>
+
+    <h2>Filtro elimina, score não pune</h2>
+    <p>
+      Empresas inelegíveis saem <em>antes</em> de pontuar. Se virassem apenas "nota baixa",
+      uma empresa ruim num critério poderia compensar com os outros e subir no rank —
+      exatamente o que o filtro existe para impedir. A ordem dos cortes é:
+    </p>
+    <ol class="cortes">
+      <li>Banco, seguradora ou holding financeira <span class="nota">(o score não se aplica a eles)</span></li>
+      <li>Liquidez abaixo do corte diário</li>
+      <li>EV/EBITDA nulo ou negativo</li>
+      <li>Patrimônio líquido negativo</li>
+      <li>Margem EBIT e ROIC ambos zerados na fonte</li>
+      <li>Qualquer fator faltando</li>
+      <li>Classe menos líquida do mesmo emissor <span class="nota">(fica uma linha por empresa)</span></li>
+    </ol>
+
+    <h3>Eliminados nesta coleta</h3>
+    <div class="rolagem">
+      <table class="tabela">
+        <thead><tr><th>Motivo</th><th class="num">Papéis</th></tr></thead>
+        <tbody id="corpoEliminados"></tbody>
+      </table>
+    </div>
+
+    <h2>Os três esquemas</h2>
+    <p>
+      As duas decisões mais frágeis de qualquer score são a escolha dos pesos e a escolha
+      do universo de comparação. Em vez de escondê-las, os três esquemas rodam em paralelo:
+    </p>
+    <div class="rolagem">
+      <table class="tabela">
+        <thead><tr><th>Esquema</th><th>Pesos</th><th>Universo do percentil</th></tr></thead>
+        <tbody>
+          <tr><td><strong>A · Principal</strong></td><td>os da tabela acima</td><td>bolsa inteira</td></tr>
+          <tr><td><strong>B · Setorial</strong></td><td>os da tabela acima</td><td>apenas pares do setor (mín. 5)</td></tr>
+          <tr><td><strong>C · Pesos iguais</strong></td><td>20% para cada</td><td>bolsa inteira</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      <strong>Consenso 3/3</strong> significa que o papel está no decil superior dos três
+      ao mesmo tempo. Isso <em>não</em> diz que a empresa é boa; diz que a posição dela não
+      é artefato das escolhas de quem montou o score.
+    </p>
+
+    <h2>Glossário dos indicadores</h2>
+    <p class="intro">
+      Todos os indicadores mostrados no site, com o que medem e onde enganam.
+    </p>
+    <div id="glossario"></div>
+
+    <h2>Limitações</h2>
+    <ul class="limites">
+      <li><strong>Não é backtest.</strong> Os pesos são plausíveis, não testados historicamente. Não há evidência de que produzam retorno superior.</li>
+      <li><strong>Não é recomendação.</strong> É triagem que reduz ~350 papéis a uma lista curta para análise qualitativa.</li>
+      <li>Os dados do Fundamentus são dos últimos 12 meses reportados e podem estar desatualizados frente ao último balanço.</li>
+      <li>O mapa de setores é manual e envelhece conforme entram novos papéis na bolsa.</li>
+      <li>Empresas cíclicas ficam bem no rank no topo do ciclo, justamente quando estão mais caras.</li>
+      <li>Não há histórico de preço, proventos ou balanços trimestrais — a fonte entrega apenas a foto dos últimos 12 meses reportados.</li>
+    </ul>
+
+    <h2>Origem dos dados</h2>
+    <p id="proveniencia" class="proveniencia"></p>
+  </section>
+
+</main>
+
+<footer class="rodape">
+  <p>
+    Projeto de portfólio, código aberto em
+    <a href="https://github.com/macedomatheus0601-cell/Viapp">github.com/macedomatheus0601-cell/Viapp</a>.
+    Dados coletados do <a href="https://www.fundamentus.com.br/resultado.php">Fundamentus</a>.
+  </p>
+  <p class="aviso-rodape">Não é recomendação de investimento.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
