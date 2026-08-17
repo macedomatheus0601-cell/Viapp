@@ -1,0 +1,38 @@
+name: Atualiza dados do Fundamentus
+
+on:
+  schedule:
+    # 01:00 UTC = 22:00 de Brasilia, depois do fechamento do pregao.
+    - cron: "0 1 * * *"
+  workflow_dispatch:        # permite rodar na mao pelo botao "Run workflow"
+
+permissions:
+  contents: write           # necessario para o bot commitar o JSON
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Rodar scraper
+        run: python scraper.py
+
+      - name: Commitar se mudou
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dados/
+          if git diff --staged --quiet; then
+            echo "Nada mudou."
+          else
+            git commit -m "dados: coleta de $(date -u +%Y-%m-%d)"
+            git push
+          fi

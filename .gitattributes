@@ -1,0 +1,8 @@
+# Garante quebra de linha LF no repositorio, independente do sistema de quem edita.
+# Sem isso, um .yml salvo no Windows pode quebrar o script bash do GitHub Actions.
+* text=auto
+
+*.yml text eol=lf
+*.yaml text eol=lf
+*.py text eol=lf
+*.json text eol=lf
