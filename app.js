@@ -852,6 +852,18 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch((e) =>
       console.warn("Service worker nao registrado:", e.message));
   });
+
+  /* Quando uma versao nova assume, a pagina ja aberta continuaria exibindo o
+     CSS e o JS antigos ate alguem recarregar na mao. Recarrega sozinha.
+     A guarda do controlador evita recarregar na primeira visita, quando o
+     primeiro service worker assume o controle e isso e normal. */
+  const jaControlada = !!navigator.serviceWorker.controller;
+  let recarregando = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!jaControlada || recarregando) return;
+    recarregando = true;
+    location.reload();
+  });
 }
 
 function marcarConexao() {

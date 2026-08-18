@@ -14,7 +14,7 @@
        na tela denuncia a idade dele.
    ------------------------------------------------------------------ */
 
-const VERSAO = "v3";
+const VERSAO = "v4";
 const CACHE_CASCA = `casca-${VERSAO}`;
 const CACHE_DADOS = `dados-${VERSAO}`;
 
@@ -33,9 +33,13 @@ const CASCA = [
 self.addEventListener("install", (ev) => {
   ev.waitUntil(
     caches.open(CACHE_CASCA)
-      // addAll falha inteiro se um arquivo falhar; guardar um a um evita que
-      // um icone ausente impeca a instalacao do resto.
-      .then((c) => Promise.allSettled(CASCA.map((u) => c.add(u))))
+      // Dois cuidados aqui:
+      // 1. cache:"reload" obriga a buscar da rede. Sem isso o proprio SW pode
+      //    guardar o arquivo velho que o navegador tinha no cache HTTP — e a
+      //    troca de versao nao adianta nada.
+      // 2. um a um em vez de addAll, que falha inteiro se um item falhar.
+      .then((c) => Promise.allSettled(
+        CASCA.map((u) => c.add(new Request(u, { cache: "reload" })))))
       .then(() => self.skipWaiting())
   );
 });
