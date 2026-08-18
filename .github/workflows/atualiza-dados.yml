@@ -2,8 +2,10 @@ name: Atualiza dados do Fundamentus
 
 on:
   schedule:
-    # 01:00 UTC = 22:00 de Brasilia, depois do fechamento do pregao.
-    - cron: "0 1 * * *"
+    # 01:37 UTC = 22:37 de Brasilia, depois do fechamento do pregao.
+    # O minuto quebrado e proposital: o agendador do GitHub e best-effort e
+    # atrasa mais no topo da hora, quando meio mundo agenda ao mesmo tempo.
+    - cron: "37 1 * * *"
   workflow_dispatch:        # permite rodar na mao pelo botao "Run workflow"
 
 permissions:

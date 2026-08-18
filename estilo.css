@@ -361,6 +361,40 @@ th.num { text-align: right; }
 
 .setor-txt { color: var(--texto-fraco); font-size: .86rem; }
 
+/* Nome da empresa: o codigo do papel nao diz nada a quem nao decorou a bolsa. */
+.papel-nome {
+  display: block;
+  margin-top: 1px;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: .74rem;
+  font-weight: 400;
+  color: var(--texto-fraco);
+}
+
+.ficha-nome {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.ficha-razao {
+  margin: 2px 0 0;
+  font-size: .82rem;
+  color: var(--texto-fraco);
+}
+
+.cartao-papel .cp-nome {
+  display: block;
+  font-size: .78rem;
+  color: var(--texto);
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .selo {
   display: inline-block;
   padding: 2px 8px;
@@ -454,9 +488,19 @@ tr.consenso-3 td:first-child { box-shadow: inset 3px 0 0 var(--destaque); }
 
 /* ------------------- indicador com explicacao ------------------- */
 
-.indicadores { display: grid; gap: 2px; }
+.indicadores {
+  display: grid;
+  /* minmax(0,...) permite a coluna encolher. Sem isso ela adota a largura do
+     item mais largo — e um texto sem quebra arrasta o cartao inteiro junto. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
 
-.indicador { border-bottom: 1px solid var(--borda); padding: 10px 0; }
+.indicador {
+  min-width: 0;
+  border-bottom: 1px solid var(--borda);
+  padding: 10px 0;
+}
 .indicador:last-child { border-bottom: 0; }
 
 .ind-topo {
@@ -464,10 +508,17 @@ tr.consenso-3 td:first-child { box-shadow: inset 3px 0 0 var(--destaque); }
   align-items: baseline;
   gap: 10px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .ind-nome { font-weight: 600; font-size: .93rem; }
-.ind-completo { color: var(--texto-fraco); font-size: .8rem; flex: 1 1 auto; }
+.ind-completo {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--texto-fraco);
+  font-size: .8rem;
+}
 
 .ind-valor {
   font-variant-numeric: tabular-nums;
@@ -508,7 +559,9 @@ tr.consenso-3 td:first-child { box-shadow: inset 3px 0 0 var(--destaque); }
 .ind-contexto {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
   margin-top: 6px;
   font-size: .78rem;
   color: var(--texto-fraco);
@@ -524,7 +577,7 @@ tr.consenso-3 td:first-child { box-shadow: inset 3px 0 0 var(--destaque); }
 }
 
 .ind-barra span { display: block; height: 100%; background: var(--acento); border-radius: 999px; }
-.ind-percentil { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ind-percentil { font-variant-numeric: tabular-nums; min-width: 0; }
 
 .explica {
   margin-top: 10px;
@@ -593,7 +646,7 @@ tr.consenso-3 td:first-child { box-shadow: inset 3px 0 0 var(--destaque); }
 
 .cartao-papel:hover { border-color: var(--acento); border-left-color: var(--destaque); }
 .cartao-papel .cp-papel { display: block; font-weight: 700; font-size: 1.02rem; color: var(--acento); }
-.cartao-papel .cp-setor { display: block; font-size: .76rem; color: var(--texto-fraco); margin: 1px 0 5px; }
+.cartao-papel .cp-setor { display: block; font-size: .74rem; color: var(--texto-fraco); margin: 1px 0 5px; }
 .cartao-papel .cp-score { font-size: .8rem; font-variant-numeric: tabular-nums; }
 
 .quartis {
@@ -829,6 +882,7 @@ tr.consenso-3 td:first-child { box-shadow: inset 3px 0 0 var(--destaque); }
   }
 
   #tabela td.col-papel::before { content: none; }
+  #tabela td.col-papel .papel-nome { max-width: none; font-size: .78rem; }
 
   #tabela td.col-setor { display: block; text-align: left; margin-bottom: 9px; }
   #tabela td.col-setor::before { content: none; }

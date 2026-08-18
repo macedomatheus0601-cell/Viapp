@@ -450,6 +450,7 @@ function desenharTabela() {
       <td class="col-pos" data-rotulo="#">${a[posDe]}</td>
       <td class="col-papel" data-rotulo="Papel">
         <button class="papel-btn" data-papel="${esc(a.papel)}">${esc(a.papel)}</button>${ciclica}
+        ${a.nome ? `<span class="papel-nome">${esc(a.nome)}</span>` : ""}
       </td>
       <td class="col-setor" data-rotulo="Setor"><span class="setor-txt">${esc(setorNome(a.setor))}</span></td>
       <td class="num" data-rotulo="Score">${num(a[chave], 1)}</td>
@@ -486,7 +487,8 @@ function montarSeletorFicha() {
   sel.innerHTML = ACOES
     .slice()
     .sort((a, b) => a.papel.localeCompare(b.papel))
-    .map((a) => `<option value="${esc(a.papel)}">${esc(a.papel)} — ${esc(setorNome(a.setor))}</option>`)
+    .map((a) => `<option value="${esc(a.papel)}">${esc(a.papel)}${
+        a.nome ? " — " + esc(a.nome) : ""} · ${esc(setorNome(a.setor))}</option>`)
     .join("");
 
   sel.addEventListener("change", () => desenharFicha(sel.value));
@@ -515,6 +517,14 @@ function barras(a, prefixo) {
       <div class="barra"><span style="width:${Math.max(0, Math.min(100, nota))}%"></span></div>
     </div>`;
   }).join("");
+}
+
+/* Razao social so aparece quando difere do nome comercial: em varias empresas
+   os dois sao iguais ("WEG SA"), e repetir a mesma linha nao informa nada. */
+function mostraRazao(a) {
+  if (!a.razao) return false;
+  const limpa = (t) => t.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return limpa(a.razao) !== limpa(a.nome || "");
 }
 
 const linha = (rot, val) =>
@@ -585,10 +595,12 @@ function desenharFicha(papel) {
   $("#ficha").innerHTML = `
     <div class="ficha-topo">
       <h2>${esc(a.papel)}</h2>
+      ${a.nome ? `<span class="ficha-nome">${esc(a.nome)}</span>` : ""}
       <span class="ficha-setor">${esc(setorNome(a.setor))}</span>
       ${a.consenso === 3 ? '<span class="selo tres">consenso 3/3</span>'
                          : `<span class="selo">${a.consenso}/3</span>`}
     </div>
+    ${mostraRazao(a) ? `<p class="ficha-razao">${esc(a.razao)}</p>` : ""}
 
     ${ressalvas.map((t) => `<p class="ressalva">${t}</p>`).join("")}
 
@@ -631,6 +643,7 @@ function montarLevantamentos() {
     ? tres.map((a) => `
         <button class="cartao-papel" data-papel="${esc(a.papel)}">
           <span class="cp-papel">${esc(a.papel)}</span>
+          ${a.nome ? `<span class="cp-nome">${esc(a.nome)}</span>` : ""}
           <span class="cp-setor">${esc(setorNome(a.setor))}</span>
           <span class="cp-score">${a.pos}º · score ${num(a.score, 1)}</span>
         </button>`).join("")

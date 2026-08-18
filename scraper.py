@@ -28,6 +28,9 @@ from setores import CICLICAS, EXCLUIR, SETOR
 # ----------------------------------------------------------------------
 
 FONTE = "https://www.fundamentus.com.br/resultado.php"
+# Segunda pagina, so para o nome das empresas: o resultado.php entrega apenas
+# o codigo do papel. Uma requisicao extra por dia, nao uma por empresa.
+FONTE_NOMES = "https://www.fundamentus.com.br/detalhes.php"
 
 # Liq.2meses do Fundamentus = volume financeiro medio negociado por dia, em R$.
 # 1.000.000 e o corte padrao. Ver justificativa no README.
@@ -181,6 +184,26 @@ def le_tabela(html: str) -> pd.DataFrame:
     return df[df["papel"].str.fullmatch(r"[A-Z]{4}\d{1,2}")].reset_index(drop=True)
 
 
+def le_nomes() -> dict[str, tuple[str, str]]:
+    """papel -> (nome comercial, razao social). {} se a fonte falhar."""
+    linhas = celulas(baixa(FONTE_NOMES))
+    cab = [normaliza(c) for c in linhas[0]]
+    try:
+        i_papel = cab.index("papel")
+        i_nome = cab.index("nomecomercial")
+        i_razao = cab.index("razaosocial")
+    except ValueError:
+        raise RuntimeError(f"Layout de {FONTE_NOMES} mudou. Cabecalhos: {cab}")
+
+    mapa = {}
+    for l in linhas[1:]:
+        if len(l) > max(i_papel, i_nome, i_razao):
+            papel = l[i_papel].strip().upper()
+            if papel:
+                mapa[papel] = (l[i_nome].strip(), l[i_razao].strip())
+    return mapa
+
+
 # ----------------------------------------------------------------------
 # CALCULO
 # ----------------------------------------------------------------------
@@ -278,7 +301,8 @@ def limpa(v):
 
 
 def monta(elig: pd.DataFrame, todos: pd.DataFrame, corte: int) -> dict:
-    campos = ["papel", "setor", "pos", "posSet", "posIg", "score", "scoreSet", "scoreIg",
+    campos = ["papel", "nome", "razao", "setor", "pos", "posSet", "posIg",
+              "score", "scoreSet", "scoreIg",
               "consenso", "setorOk", "ciclica", "roic", "roe", "cresc", "evebitda", "evebit",
               "mrgeb", "mrgbruta", "mrgliq", "div", "liq", "patr", "cot", "pl", "pvp", "dy",
               "liqcorr"] + ["n_" + k for k, *_ in FATORES] + ["s_" + k for k, *_ in FATORES]
@@ -291,6 +315,7 @@ def monta(elig: pd.DataFrame, todos: pd.DataFrame, corte: int) -> dict:
         "meta": {
             "coletado_em": datetime.now(TZ_BR).isoformat(timespec="seconds"),
             "fonte": FONTE,
+            "fonte_nomes": FONTE_NOMES,
             "corte_liquidez": corte,
             "papeis_lidos": len(todos),
             "elegiveis": len(elig),
@@ -333,6 +358,18 @@ def main() -> int:
 
         df = elimina(df, CORTE_LIQUIDEZ)
         elig = pontua(df)
+
+        # O nome e enfeite: se essa fonte cair, a coleta continua sem ele.
+        # Deixar uma falha aqui derrubar o dia inteiro seria desproporcional.
+        try:
+            mapa = le_nomes()
+            print(f"  {len(mapa)} nomes de empresa lidos")
+        except Exception as e:
+            mapa = {}
+            print(f"  AVISO: nomes indisponiveis ({type(e).__name__}); segue sem eles",
+                  file=sys.stderr)
+        elig["nome"] = elig["papel"].map(lambda p: mapa.get(p, ("", ""))[0])
+        elig["razao"] = elig["papel"].map(lambda p: mapa.get(p, ("", ""))[1])
         print(f"  {len(elig)} elegiveis (corte R$ {CORTE_LIQUIDEZ:,}/dia)".replace(",", "."))
 
         pacote = monta(elig, df, CORTE_LIQUIDEZ)
