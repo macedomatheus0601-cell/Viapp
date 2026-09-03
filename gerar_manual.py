@@ -8,7 +8,7 @@ Depende do reportlab, que nao entra no requirements.txt de proposito:
 a coleta diaria no GitHub Actions nao gera PDF e nao deve instalar isso.
 
     pip install reportlab
-    python gerar_manual.py   ->   Manual-Rank-B3.pdf
+    python gerar_manual.py   ->   Manual-Ranking-B3.pdf
 
 Nota sobre acentos: as fontes padrao do reportlab (Helvetica) cobrem todo
 o portugues, incluindo travessao e aspas tipograficas. So o "e" comercial
@@ -42,6 +42,10 @@ AMBAR       = colors.HexColor("#92400e")
 AMBAR_BG    = colors.HexColor("#fffbeb")
 CINZA       = colors.HexColor("#e2e6ec")
 CINZA_BG    = colors.HexColor("#f6f7f9")
+
+def _pc(v): return f"{v*100:.2f}%".replace(".", ",")
+def _mx(v): return f"{v:.2f}x".replace(".", ",")
+FMT_FATOR = {"roic": _pc, "cresc": _pc, "mrgeb": _pc, "evebitda": _mx, "div": _mx}
 
 LARGURA, ALTURA = A4
 MARGEM = 20 * mm
@@ -216,7 +220,7 @@ def miolo(c, doc):
     c.setFont("Helvetica", 7.5)
     c.setFillColor(TINTA_FRACA)
     c.drawString(MARGEM + 10 * mm, ALTURA - MARGEM + 4 * mm,
-                 "Rank de Qualidade  —  B3")
+                 "Ranking de Qualidade  —  B3")
     c.setFillColor(CINZA)
     c.rect(MARGEM, ALTURA - MARGEM, UTIL, 0.5, stroke=0, fill=1)
     c.rect(MARGEM, MARGEM - 5 * mm, UTIL, 0.5, stroke=0, fill=1)
@@ -238,13 +242,46 @@ def constroi(d) -> list:
     data = m["coletado_em"][:10]
     data_br = f"{data[8:10]}/{data[5:7]}/{data[0:4]}"
 
+    # Posicoes e empates sao CALCULADOS da coleta, nunca escritos a mao: o manual
+    # e regerado a cada coleta nova e numeros fixos passariam a mentir no dia
+    # seguinte. Mesma convencao do scraper: empate recebe a media das posicoes.
+    DIR_FATOR = {"roic": "hi", "cresc": "hi", "evebitda": "lo",
+                 "mrgeb": "hi", "div": "lo"}
+
+    def _ordenados(chave):
+        return sorted((a[chave] for a in acoes if a[chave] is not None),
+                      reverse=(DIR_FATOR[chave] == "hi"))
+
+    def posicao(chave, papel):
+        alvo = next(a[chave] for a in acoes if a["papel"] == papel)
+        idx = [i for i, v in enumerate(_ordenados(chave)) if v == alvo]
+        return sum(idx) / len(idx) + 1
+
+    def ordinal(x):
+        return f"{int(x)}o" if float(x).is_integer() else f"{x:.1f}o".replace(".", ",")
+
+    def acha_empate(papel):
+        """Fator em que o papel divide valor com mais gente. None se nao houver."""
+        melhor = None
+        for chave in DIR_FATOR:
+            alvo = next(a[chave] for a in acoes if a["papel"] == papel)
+            if alvo is None:
+                continue
+            grupo = sorted(a["papel"] for a in acoes if a[chave] == alvo)
+            if len(grupo) < 2:
+                continue
+            pos = [i + 1 for i, v in enumerate(_ordenados(chave)) if v == alvo]
+            if melhor is None or len(grupo) > len(melhor[1]):
+                melhor = (chave, grupo, alvo, pos)
+        return melhor
+
     S = []
     add = S.append      # um flowable
     addm = S.extend     # varios de uma vez (listas com marcador)
 
     # ---------------------------------------------------------------- capa
     add(Spacer(1, 88 * mm))
-    add(P("Rank de Qualidade", "capa_t"))
+    add(P("Ranking de Qualidade", "capa_t"))
     add(P("B3", "capa_t"))
     add(Spacer(1, 8 * mm))
     add(P("Manual completo: como o score é calculado,<br/>"
@@ -369,7 +406,7 @@ def constroi(d) -> list:
         [34 * mm, UTIL - 34 * mm]))
     add(P("É a mesma página, apenas embrulhada. Não existe versão diferente para celular: "
           "o layout se reorganiza conforme a <b>largura da tela</b>, e por isso a tabela "
-          "do rank vira uma lista de cartões no celular."))
+          "do ranking vira uma lista de cartões no celular."))
 
     add(H2("3. Sem internet"))
     add(P("Depois da primeira visita, o conteúdo fica guardado no aparelho. Sem sinal, o "
@@ -618,12 +655,24 @@ def constroi(d) -> list:
     add(H3("Empates recebem a média"))
     add(P("Quando várias empresas têm exatamente o mesmo valor, todas recebem a média das "
           "posições que ocupariam. Um exemplo real desta coleta:"))
-    add(tabela(
-        ["Papéis empatados", "Dív. Líq./Patrim.", "Posições", "Nota atribuída"],
-        [["PLPL3, ALPA4 e GGBR4", "0,15", "34, 35 e 36",
-          f"média = 35  <font color='#5b6b80'>(nota {plpl['n_div']:.1f})</font>"
-          .replace(".", ",")]],
-        [50 * mm, 28 * mm, 26 * mm, UTIL - 104 * mm]))
+    emp = acha_empate("PLPL3")
+    if emp:
+        chave, grupo, valor, pos = emp
+        rot = {"roic": "ROIC", "cresc": "Cresc. Rec. 5a", "evebitda": "EV/EBITDA",
+               "mrgeb": "Margem EBIT", "div": "Dív. Líq./Patrim."}[chave]
+        f = FMT_FATOR[chave]
+        media = sum(pos) / len(pos)
+        nota = next(a["n_" + chave] for a in acoes if a["papel"] == "PLPL3")
+        add(tabela(
+            ["Papéis empatados", rot, "Posições", "Nota atribuída"],
+            [[", ".join(grupo[:-1]) + " e " + grupo[-1], f(valor),
+              ", ".join(str(x) for x in pos[:-1]) + " e " + str(pos[-1]),
+              f"média = {media:g}".replace(".", ",")
+              + f"  <font color='#5b6b80'>(nota {nota:.1f})</font>".replace(".", ",")]],
+            [50 * mm, 28 * mm, 26 * mm, UTIL - 104 * mm]))
+    else:
+        add(P("Nesta coleta o PLPL3 não divide valor exato com nenhum outro papel em "
+              "nenhum dos cinco fatores, então não há empate para ilustrar.", "nota"))
     add(P("Sem essa regra, a ordem entre empresas idênticas seria decidida por acaso — "
           "por exemplo, pela ordem alfabética ou pela ordem em que aparecem na tabela de "
           "origem. Dar a média a todos evita premiar ou punir alguém por um critério que "
@@ -670,7 +719,8 @@ def constroi(d) -> list:
     add(PageBreak())
 
     # ---- exemplo trabalhado
-    add(H2("Exemplo completo: como o PLPL3 chegou a 88,4"))
+    _score_br = f"{plpl['score']:.1f}".replace(".", ",")
+    add(H2(f"Exemplo completo: como o PLPL3 chegou a {_score_br}"))
     add(P(f"Vamos refazer a conta inteira, do zero, com dados reais da coleta de "
           f"{data_br}. O PLPL3 (Plano&amp;Plano, construção) terminou em 1º lugar."))
 
@@ -683,24 +733,31 @@ def constroi(d) -> list:
          ["Margem EBIT", f"{plpl['mrgeb']*100:.2f}%".replace(".", ",")],
          ["Dív. Líquida / Patrimônio", f"{plpl['div']:.2f}x".replace(".", ",")]],
         [60 * mm, UTIL - 60 * mm], alinhar_dir=(1,)))
-    add(P("Sozinhos, esses números não dizem se a empresa é boa. Um ROIC de 24% é alto? "
-          "Um EV/EBITDA de 1,88 vezes é barato? Só dá para responder comparando."))
+    _roic_br = f"{plpl['roic']*100:.0f}"
+    _ev_br = f"{plpl['evebitda']:.2f}".replace(".", ",")
+    add(P(f"Sozinhos, esses números não dizem se a empresa é boa. Um ROIC de "
+          f"{_roic_br}% é alto? Um EV/EBITDA de {_ev_br} vezes é barato? "
+          f"Só dá para responder comparando."))
 
     add(H3(f"Passo 2 — a posição de cada um entre os {n} elegíveis"))
-    pesos = [("roic", "ROIC", 0.30, 7), ("cresc", "Cresc. Receita 5a", 0.20, 15),
-             ("evebitda", "EV/EBITDA", 0.20, 4), ("mrgeb", "Margem EBIT", 0.15, 50),
-             ("div", "Dív. Líq./Patrim.", 0.15, 35)]
+    pesos = [(k, rot, w, posicao(k, "PLPL3")) for k, rot, w in [
+        ("roic", "ROIC", 0.30), ("cresc", "Cresc. Receita 5a", 0.20),
+        ("evebitda", "EV/EBITDA", 0.20), ("mrgeb", "Margem EBIT", 0.15),
+        ("div", "Dív. Líq./Patrim.", 0.15)]]
     add(tabela(
         ["Indicador", "Posição", "Conta da nota", "Nota"],
-        [[rot, f"{pos}º de {n}",
-          f"({n} &#8722; {pos}) / {n-1} &#215; 100",
+        [[rot, f"{ordinal(pos)} de {n}".replace("o de", "º de"),
+          f"({n} &#8722; {pos:g}) / {n-1} &#215; 100",
           f"<b>{plpl['n_'+k]:.1f}</b>".replace(".", ",")]
          for k, rot, _, pos in pesos],
         [36 * mm, 22 * mm, 40 * mm, UTIL - 98 * mm], alinhar_dir=(1, 3)))
-    add(P("Repare no contraste: o PLPL3 é o <b>4º mais barato</b> da bolsa em EV/EBITDA "
-          "(nota 98) mas apenas o <b>50º em margem EBIT</b> (nota 68). Não é uma empresa "
-          "boa em tudo — é uma empresa muito bem posicionada em preço e rentabilidade, "
-          "mediana em margem."))
+    _pev, _pmg = posicao("evebitda", "PLPL3"), posicao("mrgeb", "PLPL3")
+    add(P(f"Repare no contraste: o PLPL3 é o <b>{ordinal(_pev)} mais barato</b> da bolsa "
+          f"em EV/EBITDA (nota {plpl['n_evebitda']:.0f}) mas apenas o "
+          f"<b>{ordinal(_pmg)} em margem EBIT</b> (nota {plpl['n_mrgeb']:.0f}). Não é uma "
+          "empresa boa em tudo — é uma empresa muito bem posicionada em preço e "
+          "rentabilidade, mediana em margem.".replace("o mais barato", "º mais barato")
+          .replace("o em margem", "º em margem")))
 
     add(H3("Passo 3 — aplicar os pesos e somar"))
     linhas = []
@@ -842,10 +899,10 @@ def constroi(d) -> list:
           "Escuro. A escolha fica salva no aparelho"],
          ["<b>Faixa de aviso</b>", "O lembrete de que nada ali é recomendação de "
           "investimento. Fica acima dos números de propósito"],
-         ["<b>As cinco abas</b>", "Rank, Ficha da ação, Levantamentos, Setores, Método"]],
+         ["<b>As cinco abas</b>", "Ranking, Ficha da ação, Levantamentos, Setores, Método"]],
         [34 * mm, UTIL - 34 * mm]))
 
-    add(H2("Aba Rank"))
+    add(H2("Aba Ranking"))
     add(P("A tela principal: a lista completa dos papéis elegíveis."))
     add(H3("Os quatro cartões do topo"))
     add(tabela(
@@ -1105,11 +1162,11 @@ def constroi(d) -> list:
             ("Patrimônio Líquido", "Valor contábil do patrimônio",
              "Ativos menos passivos, pelo valor registrado na contabilidade.",
              "Serve aqui como referência de porte da empresa.",
-             "Patrimônio líquido negativo elimina a empresa do rank antes de qualquer "
+             "Patrimônio líquido negativo elimina a empresa do ranking antes de qualquer "
              "pontuação: significa que as dívidas superam os ativos contábeis."),
             ("Volume médio/dia", "Liquidez média diária dos últimos 2 meses",
              "Volume financeiro médio negociado por dia na bolsa nos últimos dois meses.",
-             "É o filtro de entrada do rank. Abaixo do corte de R$ 1 milhão por dia o "
+             "É o filtro de entrada do ranking. Abaixo do corte de R$ 1 milhão por dia o "
              "papel é eliminado antes de pontuar.",
              "Preço de ativo que quase não negocia não reflete valor de mercado — e, na "
              "prática, você pode não conseguir vender a posição sem derrubar a cotação."),
@@ -1285,13 +1342,13 @@ def constroi(d) -> list:
 
 def main() -> None:
     d = json.loads(Path("dados/atual.json").read_text(encoding="utf-8"))
-    saida = "Manual-Rank-B3.pdf"
+    saida = "Manual-Ranking-B3.pdf"
 
     doc = BaseDocTemplate(
         saida, pagesize=A4,
         leftMargin=MARGEM, rightMargin=MARGEM,
         topMargin=MARGEM + 4 * mm, bottomMargin=MARGEM + 3 * mm,
-        title="Rank de Qualidade B3 — Manual completo",
+        title="Ranking de Qualidade B3 — Manual completo",
         author="macedomatheus0601-cell",
         subject="Como o score é calculado, como navegar e como analisar",
     )

@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------
-   Rank de Qualidade — B3
+   Ranking de Qualidade — B3
    Le dados/atual.json (gravado pelo scraper.py e atualizado todo dia
    pelo GitHub Actions) e monta as cinco abas. Sem servidor, sem banco.
    ------------------------------------------------------------------ */
@@ -217,7 +217,7 @@ const INDICADORES = {
     grupo: "valuation", fmt: "mult", dir: "lo",
     oque: "Preço da ação dividido pelo patrimônio líquido por ação.",
     ler: "Abaixo de 1 significa que o mercado paga menos do que o valor contábil do patrimônio.",
-    cuidado: "Patrimônio contábil não é valor real. Marca, software e equipe não aparecem no balanço; imóveis podem estar registrados por valor de décadas atrás. Funciona melhor para bancos e seguradoras — que este rank exclui — do que para empresas operacionais.",
+    cuidado: "Patrimônio contábil não é valor real. Marca, software e equipe não aparecem no balanço; imóveis podem estar registrados por valor de décadas atrás. Funciona melhor para bancos e seguradoras — que este ranking exclui — do que para empresas operacionais.",
   },
   dy: {
     nome: "Dividend Yield", completo: "Proventos dos últimos 12 meses sobre o preço",
@@ -245,13 +245,13 @@ const INDICADORES = {
     grupo: "porte", fmt: "reais", dir: null,
     oque: "Ativos menos passivos, pelo valor registrado na contabilidade.",
     ler: "Serve aqui como referência de porte da empresa.",
-    cuidado: "Patrimônio líquido negativo elimina a empresa do rank antes de qualquer pontuação: significa que as dívidas superam os ativos contábeis.",
+    cuidado: "Patrimônio líquido negativo elimina a empresa do ranking antes de qualquer pontuação: significa que as dívidas superam os ativos contábeis.",
   },
   liq: {
     nome: "Volume médio/dia", completo: "Liquidez média diária dos últimos 2 meses",
     grupo: "porte", fmt: "reais", dir: null,
     oque: "Volume financeiro médio negociado por dia na bolsa nos últimos dois meses.",
-    ler: "É o filtro de entrada do rank. Abaixo do corte de R$ 1 milhão por dia o papel é eliminado antes de pontuar.",
+    ler: "É o filtro de entrada do ranking. Abaixo do corte de R$ 1 milhão por dia o papel é eliminado antes de pontuar.",
     cuidado: "Preço de ativo que quase não negocia não reflete valor de mercado — e, na prática, você pode não conseguir vender a posição sem derrubar a cotação.",
   },
   cot: {
@@ -723,7 +723,7 @@ function desenharExploracao(chave) {
 
     <p class="nota nota-solta">
       Estas listas ordenam por um indicador isolado, sem pesos e sem os outros fatores.
-      Liderar um indicador sozinho não coloca a empresa no topo do rank — e nem deveria.
+      Liderar um indicador sozinho não coloca a empresa no topo do ranking — e nem deveria.
     </p>`;
 }
 

@@ -1,4 +1,4 @@
-# Rank de Qualidade — B3
+# Ranking de Qualidade — B3
 
 Ranking multifator de ações brasileiras, atualizado automaticamente todo dia a partir do
 [Fundamentus](https://www.fundamentus.com.br/resultado.php).
@@ -22,7 +22,7 @@ universo elegível, não pelo valor bruto. Isso torna os pesos comparáveis entr
 
 **Filtro elimina, score não pune.** Empresas inelegíveis saem antes de pontuar — se
 virassem "nota baixa", uma empresa ruim poderia compensar com outros critérios e subir
-no rank. Ordem dos cortes:
+no ranking. Ordem dos cortes:
 
 1. Banco, seguradora ou holding financeira (o score não se aplica a eles)
 2. Liquidez abaixo de R$ 1.000.000/dia
@@ -77,4 +77,4 @@ python scraper.py
 - Os dados do Fundamentus são dos últimos 12 meses reportados e podem estar
   desatualizados frente ao último balanço.
 - O mapa de setores é manual e envelhece conforme entram novos papéis na bolsa.
-- Empresas cíclicas ficam bem no rank no topo do ciclo, quando estão mais caras.
+- Empresas cíclicas ficam bem no ranking no topo do ciclo, quando estão mais caras.

@@ -14,7 +14,7 @@
        na tela denuncia a idade dele.
    ------------------------------------------------------------------ */
 
-const VERSAO = "v4";
+const VERSAO = "v5";
 const CACHE_CASCA = `casca-${VERSAO}`;
 const CACHE_DADOS = `dados-${VERSAO}`;
 
