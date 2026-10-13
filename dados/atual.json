@@ -1,6 +1,6 @@
 {
  "meta": {
-  "coletado_em": "2026-10-12T04:54:41-03:00",
+  "coletado_em": "2026-10-13T05:20:30-03:00",
   "fonte": "https://www.fundamentus.com.br/resultado.php",
   "fonte_nomes": "https://www.fundamentus.com.br/detalhes.php",
   "corte_liquidez": 1000000,
@@ -6365,21 +6365,6 @@
  ],
  "eliminados": [
   {
-   "papel": "CSTB3",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "CFLU4",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "POPR4",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
    "papel": "PMET3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
@@ -6411,6 +6396,21 @@
   },
   {
    "papel": "MNSA3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "CFLU4",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "CSTB3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "POPR4",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -7765,41 +7765,6 @@
    "liq": 0.0
   },
   {
-   "papel": "SGEN3",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "DUFB11",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "TNEP4",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "MLPA3",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "CLSC6",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "CCHI3",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "SFSA3",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
    "papel": "PRBC3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
@@ -7810,7 +7775,7 @@
    "liq": 0.0
   },
   {
-   "papel": "CZRS3",
+   "papel": "SFSA3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -7850,7 +7815,7 @@
    "liq": 0.0
   },
   {
-   "papel": "CSPC4",
+   "papel": "CZRS3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -7865,24 +7830,14 @@
    "liq": 0.0
   },
   {
+   "papel": "CSPC4",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
    "papel": "ARND3",
    "motivo": "liquidez abaixo do corte",
    "liq": 1803.61
-  },
-  {
-   "papel": "MSAN4",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "GALO4",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "BBTG13",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
   },
   {
    "papel": "INHA3",
@@ -7905,7 +7860,17 @@
    "liq": 0.0
   },
   {
-   "papel": "SGEN4",
+   "papel": "MSAN4",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "GALO4",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "BBTG13",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -7915,7 +7880,7 @@
    "liq": 0.0
   },
   {
-   "papel": "BBTG11",
+   "papel": "SGEN4",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -7940,7 +7905,7 @@
    "liq": 0.0
   },
   {
-   "papel": "GPIV33",
+   "papel": "BBTG11",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -7965,7 +7930,7 @@
    "liq": 0.0
   },
   {
-   "papel": "BERG3",
+   "papel": "GPIV33",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -7990,7 +7955,7 @@
    "liq": 0.0
   },
   {
-   "papel": "BMEF3",
+   "papel": "BERG3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -8005,7 +7970,7 @@
    "liq": 0.0
   },
   {
-   "papel": "ODER3",
+   "papel": "BMEF3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -8015,7 +7980,7 @@
    "liq": 0.0
   },
   {
-   "papel": "CSPC3",
+   "papel": "ODER3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -8035,7 +8000,7 @@
    "liq": 0.0
   },
   {
-   "papel": "ICPI3",
+   "papel": "CSPC3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -8065,17 +8030,7 @@
    "liq": 860.66
   },
   {
-   "papel": "GALO3",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "SLCP3",
-   "motivo": "liquidez abaixo do corte",
-   "liq": 0.0
-  },
-  {
-   "papel": "DAYC3",
+   "papel": "ICPI3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
@@ -8096,6 +8051,51 @@
   },
   {
    "papel": "MSAN3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "GALO3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "SLCP3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "DAYC3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "DUFB11",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "TNEP4",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "MLPA3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "CLSC6",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "SGEN3",
+   "motivo": "liquidez abaixo do corte",
+   "liq": 0.0
+  },
+  {
+   "papel": "CCHI3",
    "motivo": "liquidez abaixo do corte",
    "liq": 0.0
   },
